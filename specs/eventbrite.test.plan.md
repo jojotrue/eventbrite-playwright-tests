@@ -4,6 +4,20 @@
 
 This test plan covers comprehensive testing of the Eventbrite.com homepage, including navigation functionality, search capabilities, filtering options, custom event browsing, and form validation for error handling. Tests focus on user interactions like searching for events, filtering by category and location, navigating between sections, and validating error messages. This excludes login/signup account creation to avoid external site spam.
 
+## Implementation Status
+
+This plan was drafted with Playwright's test planner agent in early 2026. Eventbrite has since redesigned parts of the site (see the README), so several scenarios describe UI that no longer exists or appears only on some homepage versions.
+
+Implemented and verified November 2026:
+
+| Plan ID | Scenario | Test file |
+|---------|----------|-----------|
+| 1.1 | Navigate to the music/concerts category from the homepage | `tests/navigation/concerts-category.spec.js` |
+| 1.6 | Click Eventbrite logo to return home | `tests/navigation/logo-navigation.spec.js` |
+| 2.1 | Search for events by keyword | `tests/search/search-by-keyword.spec.js` |
+
+Not automated: 1.7 (the Find Events link was removed in the redesign) and 3.5 (the neighborhood section is not consistently present). All other scenarios are planned only. Breadcrumb steps are not automated because breadcrumbs don't appear consistently.
+
 ## Test Scenarios
 
 ### 1. Navigation & Exploration
@@ -12,7 +26,7 @@ This test plan covers comprehensive testing of the Eventbrite.com homepage, incl
 
 #### 1.1. Navigate to Music category from homepage
 
-**File:** `tests/navigation/music-category.spec.ts`
+**File:** `tests/navigation/music-category.spec.js`
 
 **Steps:**
   1. User is on the Eventbrite homepage
@@ -26,7 +40,7 @@ This test plan covers comprehensive testing of the Eventbrite.com homepage, incl
 
 #### 1.2. Navigate to Nightlife category
 
-**File:** `tests/navigation/nightlife-category.spec.ts`
+**File:** `tests/navigation/nightlife-category.spec.js`
 
 **Steps:**
   1. User is on the Eventbrite homepage
@@ -39,7 +53,7 @@ This test plan covers comprehensive testing of the Eventbrite.com homepage, incl
 
 #### 1.3. Navigate to Performing & Visual Arts category
 
-**File:** `tests/navigation/arts-category.spec.ts`
+**File:** `tests/navigation/arts-category.spec.js`
 
 **Steps:**
   1. User is on the Eventbrite homepage
@@ -52,7 +66,7 @@ This test plan covers comprehensive testing of the Eventbrite.com homepage, incl
 
 #### 1.4. Navigate to Business category
 
-**File:** `tests/navigation/business-category.spec.ts`
+**File:** `tests/navigation/business-category.spec.js`
 
 **Steps:**
   1. User is on the Eventbrite homepage
@@ -65,7 +79,7 @@ This test plan covers comprehensive testing of the Eventbrite.com homepage, incl
 
 #### 1.5. Navigate to Food & Drink category
 
-**File:** `tests/navigation/food-drink-category.spec.ts`
+**File:** `tests/navigation/food-drink-category.spec.js`
 
 **Steps:**
   1. User is on the Eventbrite homepage
@@ -78,7 +92,7 @@ This test plan covers comprehensive testing of the Eventbrite.com homepage, incl
 
 #### 1.6. Click Eventbrite logo to return home
 
-**File:** `tests/navigation/logo-navigation.spec.ts`
+**File:** `tests/navigation/logo-navigation.spec.js`
 
 **Steps:**
   1. User is on the Eventbrite homepage
@@ -89,7 +103,7 @@ This test plan covers comprehensive testing of the Eventbrite.com homepage, incl
 
 #### 1.7. Navigate via Find Events link
 
-**File:** `tests/navigation/find-events.spec.ts`
+**File:** `tests/navigation/find-events.spec.js`
 
 **Steps:**
   1. User is on the Eventbrite homepage
@@ -106,7 +120,7 @@ This test plan covers comprehensive testing of the Eventbrite.com homepage, incl
 
 #### 2.1. Search for events by keyword
 
-**File:** `tests/search/search-by-keyword.spec.ts`
+**File:** `tests/search/search-by-keyword.spec.js`
 
 **Steps:**
   1. User is on the Eventbrite homepage
@@ -122,7 +136,7 @@ This test plan covers comprehensive testing of the Eventbrite.com homepage, incl
 
 #### 2.2. Search with location change
 
-**File:** `tests/search/search-with-location.spec.ts`
+**File:** `tests/search/search-with-location.spec.js`
 
 **Steps:**
   1. User is on the Eventbrite homepage
@@ -138,7 +152,7 @@ This test plan covers comprehensive testing of the Eventbrite.com homepage, incl
 
 #### 2.3. Search with empty keyword field
 
-**File:** `tests/search/search-empty.spec.ts`
+**File:** `tests/search/search-empty.spec.js`
 
 **Steps:**
   1. User is on the Eventbrite homepage
@@ -152,7 +166,7 @@ This test plan covers comprehensive testing of the Eventbrite.com homepage, incl
 
 #### 2.4. Search field accepts multiple characters
 
-**File:** `tests/search/search-multiple-chars.spec.ts`
+**File:** `tests/search/search-multiple-chars.spec.js`
 
 **Steps:**
   1. User is on the Eventbrite homepage
@@ -166,7 +180,7 @@ This test plan covers comprehensive testing of the Eventbrite.com homepage, incl
 
 #### 2.5. Autocomplete location suggestions
 
-**File:** `tests/search/location-autocomplete.spec.ts`
+**File:** `tests/search/location-autocomplete.spec.js`
 
 **Steps:**
   1. User is on the Eventbrite homepage and clicks the location field
@@ -183,7 +197,7 @@ This test plan covers comprehensive testing of the Eventbrite.com homepage, incl
 
 #### 3.1. Browse events by All tab
 
-**File:** `tests/filtering/browse-all-tab.spec.ts`
+**File:** `tests/filtering/browse-all-tab.spec.js`
 
 **Steps:**
   1. User is on the events listing page
@@ -196,7 +210,7 @@ This test plan covers comprehensive testing of the Eventbrite.com homepage, incl
 
 #### 3.2. Browse events by For You tab
 
-**File:** `tests/filtering/browse-for-you-tab.spec.ts`
+**File:** `tests/filtering/browse-for-you-tab.spec.js`
 
 **Steps:**
   1. User is on the events listing page with browsing tabs visible
@@ -209,7 +223,7 @@ This test plan covers comprehensive testing of the Eventbrite.com homepage, incl
 
 #### 3.3. Browse events by Today tab
 
-**File:** `tests/filtering/browse-today-tab.spec.ts`
+**File:** `tests/filtering/browse-today-tab.spec.js`
 
 **Steps:**
   1. User is on the events listing page
@@ -223,7 +237,7 @@ This test plan covers comprehensive testing of the Eventbrite.com homepage, incl
 
 #### 3.4. Browse events by This Weekend tab
 
-**File:** `tests/filtering/browse-weekend-tab.spec.ts`
+**File:** `tests/filtering/browse-weekend-tab.spec.js`
 
 **Steps:**
   1. User is on the events listing page
@@ -237,7 +251,7 @@ This test plan covers comprehensive testing of the Eventbrite.com homepage, incl
 
 #### 3.5. Explore by neighborhood tabs
 
-**File:** `tests/filtering/neighborhood-tabs.spec.ts`
+**File:** `tests/filtering/neighborhood-tabs.spec.js`
 
 **Steps:**
   1. User is on the 'Find Events' page or events listing page for a city
@@ -250,7 +264,7 @@ This test plan covers comprehensive testing of the Eventbrite.com homepage, incl
 
 #### 3.6. Category cards display and interact
 
-**File:** `tests/filtering/category-cards.spec.ts`
+**File:** `tests/filtering/category-cards.spec.js`
 
 **Steps:**
   1. User is on the Eventbrite homepage showing category cards
@@ -268,7 +282,7 @@ This test plan covers comprehensive testing of the Eventbrite.com homepage, incl
 
 #### 4.1. Login form - missing email validation error
 
-**File:** `tests/validation/login-missing-email.spec.ts`
+**File:** `tests/validation/login-missing-email.spec.js`
 
 **Steps:**
   1. User navigates to the Eventbrite login page via Log In button
@@ -285,7 +299,7 @@ This test plan covers comprehensive testing of the Eventbrite.com homepage, incl
 
 #### 4.2. Login form - missing password validation error
 
-**File:** `tests/validation/login-missing-password.spec.ts`
+**File:** `tests/validation/login-missing-password.spec.js`
 
 **Steps:**
   1. User navigates to the login page and enters a valid email (e.g., 'test@example.com')
@@ -304,7 +318,7 @@ This test plan covers comprehensive testing of the Eventbrite.com homepage, incl
 
 #### 4.3. Search with invalid characters handling
 
-**File:** `tests/validation/search-special-characters.spec.ts`
+**File:** `tests/validation/search-special-characters.spec.js`
 
 **Steps:**
   1. User is on the Eventbrite homepage with the search field visible
@@ -320,7 +334,7 @@ This test plan covers comprehensive testing of the Eventbrite.com homepage, incl
 
 #### 4.4. Location field with empty input handling
 
-**File:** `tests/validation/location-empty.spec.ts`
+**File:** `tests/validation/location-empty.spec.js`
 
 **Steps:**
   1. User is on the Eventbrite homepage with the location field visible
@@ -333,7 +347,7 @@ This test plan covers comprehensive testing of the Eventbrite.com homepage, incl
 
 #### 4.5. Form field radio button or checkbox behavior
 
-**File:** `tests/validation/form-field-interactions.spec.ts`
+**File:** `tests/validation/form-field-interactions.spec.js`
 
 **Steps:**
   1. User is on a page with any form elements (e.g., reCAPTCHA on login, checkboxes, radio buttons if present)

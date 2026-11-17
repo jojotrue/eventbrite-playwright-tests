@@ -1,10 +1,11 @@
 name: Playwright Tests
 
+# Runs against the live Eventbrite site, so it runs only on pull requests
+# and on demand. No scheduled runs: the site changes without notice.
 on:
-  push:
-    branches: [ main, master ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   test:

@@ -1,11 +1,14 @@
 {
-  "name": "eventbrite",
+  "name": "eventbrite-playwright-tests",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {},
+  "description": "Playwright end-to-end tests for Eventbrite navigation, search, and browsing, using the Page Object Model and custom fixtures",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "report": "playwright show-report"
+  },
   "keywords": [],
-  "author": "",
+  "author": "Joanne Trujillo",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {

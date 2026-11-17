@@ -1,229 +1,131 @@
-# Eventbrite Test Automation Framework
+# Eventbrite Playwright Tests
 
-![Playwright Tests](https://github.com/jojotrue/eventbrite-automation/actions/workflows/playwright.yml/badge.svg)
+![Playwright Tests](https://github.com/jojotrue/eventbrite-playwright-tests/actions/workflows/playwright.yml/badge.svg)
 
-A Playwright-based end-to-end test automation framework for [Eventbrite.com](https://www.eventbrite.com), built using the Page Object Model (POM) pattern with custom fixtures. This project covers navigation, search, and event discovery workflows, with additional test coverage actively being added.
+End-to-end tests for [Eventbrite.com](https://www.eventbrite.com) written in Playwright and JavaScript, using the Page Object Model and a custom fixture. The tests were drafted with AI test agents, then reviewed, corrected, and re-verified by hand against the live site in November 2026.
 
-> **Note:** This framework was developed using an AI-assisted authoring workflow powered by Claude Playwright agents — a deliberate choice to demonstrate modern QA engineering practices that leverage AI tooling for faster, higher-quality test generation.
-
----
-
-## Table of Contents
-
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Key Design Patterns](#key-design-patterns)
-  - [Page Object Model](#page-object-model)
-  - [Custom Fixtures](#custom-fixtures)
-- [Test Coverage](#test-coverage)
-- [Getting Started](#getting-started)
-- [Running Tests](#running-tests)
-- [Configuration](#configuration)
-- [Roadmap](#roadmap)
+This repo is mostly about that review. The generated tests passed without testing anything, and the live site changed underneath them. Both problems, and how I handled them, are documented below.
 
 ---
 
-## Tech Stack
+## What's Covered
 
-- **[Playwright](https://playwright.dev/)** — cross-browser end-to-end testing
-- **JavaScript (CommonJS / ESM)** — test and page object authoring
-- **HTML Reporter** — built-in Playwright HTML test reports
-- **Trace Viewer** — automatic trace capture on first retry for debugging
+| Plan ID | Test | What it checks |
+|---------|------|----------------|
+| 1.1 | Music category | Clicking the homepage's music category ("For Concerts" or "Music") opens a music or concert listing |
+| 1.6 | Logo navigation | From the Denver events page, the header logo returns to the homepage |
+| 2.1 | Keyword search | Searching "music" opens matching results and keeps the keyword in the search box |
+
+The full test plan, with implementation status, is in [specs/eventbrite.test.plan.md](specs/eventbrite.test.plan.md).
+
+**Last verified:** November 2026, Chromium.
 
 ---
 
 ## Project Structure
 
 ```
-eventbrite/
+eventbrite-playwright-tests/
 ├── .github/
-│   └── agents/                        # Claude AI agent configs
-│       ├── playwright-test-generator.agent.md
-│       ├── playwright-test-healer.agent.md
-│       └── playwright-test-planner.agent.md
+│   ├── agents/                      # Playwright test agent definitions (planner, generator, healer)
+│   └── workflows/playwright.yml     # GitHub Actions CI
 ├── fixtures/
-│   └── homePage.fixture.js            # Custom Playwright fixture (extends base test)
+│   └── homePage.fixture.js          # Extends Playwright's test with a ready-to-use HomePage
 ├── pages/
-│   └── homePage.js                    # Page Object Model for the Eventbrite homepage
+│   └── homePage.js                  # Page Object Model
 ├── specs/
-│   ├── eventbrite.test.plan.md        # Human-readable test plan
-│   └── README.md
+│   └── eventbrite.test.plan.md      # Test plan with implementation status
 ├── tests/
-│   ├── navigation/
-│   │   ├── find-events.spec.js
-│   │   └── music-category.spec.js
-│   ├── search/
-│   │   └── search-by-keyword.spec.js
-│   └── eventbrite.seed.spec.js        # Seed spec for scaffolding new tests
-├── playwright.config.js
-├── package.json
-└── .gitignore
+│   ├── navigation/concerts-category.spec.js
+│   ├── navigation/logo-navigation.spec.js
+│   ├── search/search-by-keyword.spec.js
+│   └── eventbrite.seed.spec.js      # Scaffold for the generator agent (excluded from runs)
+└── playwright.config.js
 ```
 
 ---
 
-## Key Design Patterns
+## Design
 
-### Page Object Model
+**Page Object Model.** `pages/homePage.js` holds every locator and action the tests use. Locators are role-based (`getByRole`) so they follow what a user sees rather than CSS classes. The header logo is scoped to Eventbrite's `global-nav` test ID, because city pages also have a "Home" breadcrumb link.
 
-The `HomePage` class in `pages/homePage.js` encapsulates all selectors and interactions for the Eventbrite homepage and its downstream pages (search results, category pages, login). This keeps test logic clean and selectors centralized — changes to the UI only require updates in one place.
+**Custom fixture.** `fixtures/homePage.fixture.js` creates the page object and opens the homepage before each test.
 
-The POM covers:
-
-- **Main navigation** — Find Events, Create Events, Log In, Sign Up, Help Center
-- **Search & location** — keyword search input, location combobox, search submission
-- **Category browsing** — Music, Nightlife, Performing Arts, Food & Drink, Business, and more — scoped to the `icon-category-browse` container to avoid strict mode violations
-- **Browse tabs** — All, For You, Today, This Weekend
-- **Neighborhood navigation** — tablist-based neighborhood filtering with dynamic tab count support
-- **Event results** — event card locators, heading counts, event lookup by name
-- **Login form** — email, password, continue/sign-in flow, password visibility toggle, error alerts
-- **Breadcrumb navigation** — with graceful fallback for text-only (non-link) breadcrumb items
-
-```js
-// Example: Using the POM in a test
-const { test, expect } = require('../fixtures/homePage.fixture');
-
-test('user can search for a music event', async ({ homePage, page }) => {
-  await homePage.searchForEvent('jazz festival', 'New York');
-  await expect(page).toHaveURL(/search/);
-});
-```
-
-### Custom Fixtures
-
-`fixtures/homePage.fixture.js` extends Playwright's base `test` object to automatically instantiate the `HomePage` POM and navigate to the homepage before each test. This eliminates boilerplate setup from every spec file and ensures a consistent starting state.
-
-```js
-const test = base.extend({
-  homePage: async ({ page }, use) => {
-    const homePage = new HomePage(page);
-    await homePage.goto('/');
-    await use(homePage);
-  }
-});
-```
-
-All spec files import from the fixture instead of `@playwright/test` directly, giving every test immediate access to the fully initialized page object.
+**Stable elements only.** Eventbrite serves different homepage versions at random (see below). The tests use only elements present on every version: the header logo, the search bar, and the music category link, which accepts either of its two labels.
 
 ---
 
-## Test Coverage
+## AI-Assisted Workflow and Review
 
-| Area | Tests |
-|---|---|
-| Navigation | Find Events link, category navigation (Music, etc.) |
-| Search | Keyword search, search results validation |
-| Event Discovery | Category pages, breadcrumbs, event card listings |
-| *(Planned)* | Additional categories, neighborhood filtering, login flows |
-
----
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js `v18+`
-- npm `v9+`
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/your-username/eventbrite-automation.git
-cd eventbrite-automation
-
-# Install dependencies
-npm install
-
-# Install Playwright browsers
-npx playwright install
-```
-
----
-
-## Running Tests
-
-```bash
-# Run all tests
-npx playwright test
-
-# Run a specific test file
-npx playwright test tests/navigation/find-events.spec.js
-
-# Run tests with the HTML reporter open after the run
-npx playwright test --reporter=html
-
-# Open the last HTML report
-npx playwright show-report
-
-# Run in headed mode (watch the browser)
-npx playwright test --headed
-
-# Run in UI mode (interactive test explorer)
-npx playwright test --ui
-```
-
----
-
-## Configuration
-
-Configuration lives in `playwright.config.js`. Key settings:
-
-| Setting | Value |
-|---|---|
-| Base URL | `https://www.eventbrite.com/` |
-| Browser | Chromium (Desktop Chrome) |
-| Parallelism | Fully parallel locally; single worker on CI |
-| Retries | 0 locally; 2 on CI |
-| Trace | Captured on first retry |
-| Reporter | HTML |
-
-Firefox and WebKit projects are scaffolded and commented out — ready to enable for cross-browser coverage.
-
----
-
-## AI-Assisted Authoring
-
-This framework uses a three-agent Claude workflow for test development:
+The first drafts came from Playwright's three test agents:
 
 | Agent | Role |
-|---|---|
-| `playwright-test-planner` | Analyzes features and generates a structured test plan |
-| `playwright-test-generator` | Authors spec files from the plan using the existing POM and fixtures |
-| `playwright-test-healer` | Detects and repairs broken selectors or flaky tests |
+|-------|------|
+| Planner | Explored the site and wrote the test plan |
+| Generator | Wrote spec files from the plan using the page object and fixture |
+| Healer | Suggested fixes when tests failed |
 
-This workflow accelerates test authoring while keeping the engineer in control of architecture, patterns, and review. The agents operate within the conventions established by the POM and fixture layer — they don't replace engineering judgment, they amplify it.
+The generated suite ran green but did not test what it claimed to. These are the problems I found in review and how I fixed them:
 
----
-
-## CI/CD
-
-Tests run automatically on every pull request to `main` via GitHub Actions.
-
-The workflow:
-1. Installs Node.js 20 and dependencies via `npm ci`
-2. Installs Chromium with system dependencies
-3. Runs the full Playwright test suite
-4. Uploads the HTML report as a downloadable artifact (retained 30 days)
-5. Posts a pass/fail comment directly to the PR with a link to the report
-6. Fails the build if any tests fail
-
-The workflow file lives at `.github/workflows/playwright.yml`.
+| Problem in the generated code | Fix |
+|-------------------------------|-----|
+| `music-category.spec.js` was a copy of the Find Events test, with the same title, and never clicked Music | Rewrote it to click the music category and check the URL and heading |
+| Neighborhood checks were wrapped in `try/catch` and `if` blocks, so the test passed when the section never loaded | Rewrote with required assertions; later removed the test when the section stopped appearing reliably (see below) |
+| Breadcrumb checks ran only "if present," so they could never fail | Removed; breadcrumbs don't appear consistently |
+| Assertions were loosened to get green builds (for example, a heading text check was dropped) | Restored meaningful assertions on URLs and headings |
+| Fixed waits (`waitForTimeout`) used to paper over timing | Replaced with Playwright's auto-waiting assertions |
+| A browser flag to hide automation from Eventbrite's bot detection | Removed; the tests don't try to get around a site's protections |
+| Debug `console.log` statements left in tests | Removed |
+| The empty seed spec ran as a passing test | Excluded from runs with `testIgnore` |
+| The README described page object methods and coverage that didn't exist | Rewrote the README to match the code |
 
 ---
 
-## Roadmap
+## Site Changes Found During Re-verification (November 2026)
 
-- [ ] Expand navigation test coverage across all category pages
-- [ ] Add neighborhood tab filtering tests
-- [ ] Add login flow tests (valid, invalid credentials, error states)
-- [ ] Enable Firefox and WebKit cross-browser projects
-- [x] Integrate GitHub Actions CI workflow
-- [ ] Add visual regression testing
+When I re-ran the corrected tests, three failed. The page snapshots in Playwright's error reports showed the site had changed, not the tests:
+
+- **The "Find Events" header link was removed.** Test 1.7 was dropped.
+- **Eventbrite serves at least three homepage versions at random.** One is attendee-focused ("Find your next favorite thing"), one is organizer-focused ("Sell tickets Where Millions already Buy them"), and one leads with category links ("Browsing events in"). Content like the Top destinations carousel exists on only some of them, so tests built on it would pass or fail depending on which version loaded.
+- **The music category has two labels.** It's "For Concerts" on some versions and "Music" on others. Test 1.1 accepts either, and still checks that the click leads to a music or concert listing.
+- **The "Explore by neighborhood" section is no longer consistently present.** Test 3.5 was dropped.
+- **City pages now include a "Home" breadcrumb,** which made the logo locator ambiguous. It's now scoped to the header.
+
+I updated the tests to match the current site rather than loosening assertions until they passed.
+
+---
+
+## Running the Tests
+
+**Prerequisites:** Node.js 18 or later.
+
+```bash
+git clone https://github.com/jojotrue/eventbrite-playwright-tests.git
+cd eventbrite-playwright-tests
+npm install
+npx playwright install chromium
+
+npm test                  # run all tests
+npm run test:headed       # watch the browser
+npm run report            # open the last HTML report
+```
+
+---
+
+## CI
+
+GitHub Actions runs the suite on pull requests to `main` and on demand (`workflow_dispatch`). There are no scheduled runs, because the tests hit the live Eventbrite site, which changes without notice. The badge shows the result of the last deliberate run. Each run uploads the HTML report as an artifact, and pull request runs post a pass/fail comment.
+
+---
+
+## Limitations
+
+- **Live third-party site.** Eventbrite will keep changing. These tests reflect the site as of November 2026, and a future failure is more likely a site change than a defect.
+- **Bot protection.** Eventbrite may challenge automated traffic, especially from CI servers. The suite does not try to bypass this.
+- **Chromium only.** Firefox and WebKit are not configured.
 
 ---
 
 ## Author
 
-Built by [jojotrue](https://github.com/jojotrue) — QA Engineer  
-
+Joanne Trujillo · [GitHub](https://github.com/jojotrue) · [LinkedIn](https://linkedin.com/in/joanne-trujillo)
