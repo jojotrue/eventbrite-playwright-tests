@@ -114,7 +114,7 @@ npm run report            # open the last HTML report
 
 ## CI
 
-GitHub Actions runs the suite on pull requests to `main` and on demand (`workflow_dispatch`). There are no scheduled runs, because the tests hit the live Eventbrite site, which changes without notice. The badge shows the result of the last deliberate run. Each run uploads the HTML report as an artifact, and pull request runs post a pass/fail comment.
+GitHub Actions runs the suite on pull requests to `main` and on demand (`workflow_dispatch`). There are no scheduled runs, because the tests hit the live Eventbrite site, which changes without notice. The badge shows the result of the last deliberate run. Each run uploads the HTML report as an artifact, and pull request runs post a pass/fail comment. The runner is pinned to `ubuntu-24.04`. In November 2026, GitHub moved `ubuntu-latest` to Ubuntu 26.04, which Playwright 1.58 doesn't support, and the browser install step failed before any test ran. Pinning the version keeps CI from breaking when the default image changes, for the same reason the tests avoid parts of Eventbrite that change without notice.
 
 ---
 
